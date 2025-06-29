@@ -1,0 +1,52 @@
+# Python related
+__pycache__/
+*.py[cod]
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+.eggs/
+*.manifest
+*.spec
+
+# Virtual environments (anywhere)
+**/venv/
+**/.venv/
+
+# Pytest cache
+.pytest_cache/
+
+# VSCode stuff
+.vscode/
+.vscode-test/
+.vscode-smoke/
+
+# Logs and temp files
+*.log
+tmp/
+debug*.log
+debugpy*.log
+pydevd*.log
+
+# Coverage reports
+.coverage
+coverage/
+htmlcov/
+*.cover
+*.coverage.*
+
+# Node.js dependencies
+**/node_modules/
+
+# System files
+.DS_Store
+
+# Env vars
+.env
+
+# Misc leftovers from old repo - remove if not needed
+# port.txt
+# precommit.hook
+
+# Add any new service-specific ignores here if needed
