@@ -8,3 +8,4 @@ Celery==5.5.1
 psycopg2-binary==2.9.10
 chromadb==1.0.8
 gunicorn==21.2.0
+openai==1.93.0

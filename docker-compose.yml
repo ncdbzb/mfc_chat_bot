@@ -18,7 +18,9 @@ services:
       dockerfile: Dockerfile.mfc_backend
     container_name: mfc_backend
     ports:
-      - "8000:8000"
+      - ${MFC_BACKEND_PORT}:${MFC_BACKEND_PORT}
+    command: >
+      uvicorn app.main:app --host 0.0.0.0 --port ${MFC_BACKEND_PORT}
     depends_on:
       - mfc_parser
     env_file:
@@ -47,6 +49,23 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
+  chromadb:
+      image: chromadb/chroma:1.0.12
+      container_name: chromadb
+      expose:
+        - ${CHROMADB_PORT}
+      restart: unless-stopped
+      volumes:
+        - chroma_data:/chroma/chroma
+        - ./chromadb_config.yaml:/config.yaml
+      env_file:
+        - .env
+      healthcheck:
+        test: ["CMD", "/bin/bash", "-c", "cat < /dev/null > /dev/tcp/localhost/${CHROMADB_PORT}"]
+        interval: 30s
+        timeout: 10s
+        retries: 3
+
   redis:
     container_name: redis
     image: redis:alpine
@@ -55,3 +74,4 @@ services:
 
 volumes:
   postgres_data:
+  chroma_data:
