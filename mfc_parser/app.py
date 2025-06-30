@@ -1,6 +1,6 @@
 import redis
 from chromadb_functions import get_situation_from_chromadb_by_id
-from chromadb_functions import search_chroma_by_text
+from chromadb_functions import search_chroma_by_text, get_collection
 from flask import jsonify, request
 from models import db, Ticket
 from tasks import update_mfc_db_task, update_chromadb_task
@@ -8,6 +8,7 @@ from celery.result import AsyncResult
 from tasks import celery
 from flask_app import create_app
 from config import Config
+from logger import logger
 
 app = create_app()
 
@@ -48,6 +49,18 @@ def is_chromadb_updating():
         else:
             return jsonify({"status": "Chromadb update completed", "result": task_result.result})
     return jsonify({"status": "No chromadb update in progress"})
+
+@app.route('/is_pg_filled', methods=['GET'])
+def is_pg_filled():
+    count = Ticket.query.count()
+    return jsonify({"filled": count > 0, "count": count})
+
+@app.route('/is_chroma_filled', methods=['GET'])
+def is_chroma_filled():
+    collection = get_collection()
+    count = collection.count()
+    logger.info(f'ДЛИНА КОЛЛЕКЦИИ: {count}')
+    return jsonify({"filled": count > 0, "count": count})
 
 @app.route('/get_situation_by_id/<string:ticket_id>', methods=['GET'])
 def get_situation_by_id(ticket_id):

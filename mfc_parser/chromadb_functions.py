@@ -38,7 +38,7 @@ def update_chromadb():
         host=Config.DB_HOST,
         port=Config.DB_PORT
     )
-        
+
     cur = conn.cursor()
     cur.execute("SELECT id, text FROM ticket")
     rows = cur.fetchall()
@@ -47,7 +47,7 @@ def update_chromadb():
 
     if ids:
         collection.delete(ids=ids)
-        
+
     batch_size = 100
     for i in range(0, len(docs), batch_size):
         batch_docs = docs[i:i + batch_size]

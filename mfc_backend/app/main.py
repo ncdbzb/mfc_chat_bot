@@ -1,22 +1,34 @@
+import asyncio
 from fastapi import FastAPI
 from pydantic import BaseModel
-from app.clients.openai_client import CustomLLM, CustomOllamaEmbeddings
+from contextlib import asynccontextmanager
 
-app = FastAPI()
+from app.clients.parser_client import MFCParserClient
 
-llm = CustomLLM()
-embeddings = CustomOllamaEmbeddings()
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    async def wait_for_parser_readiness():
+        await asyncio.sleep(1)
+        client = MFCParserClient()
+        loop = asyncio.get_event_loop()
+        await loop.run_in_executor(None, client.wait_until_ready)
 
+    await wait_for_parser_readiness()
+    yield
+
+
+app = FastAPI(lifespan=lifespan)
 
 class PromptRequest(BaseModel):
     prompt: str
 
-
 @app.post("/generate")
 def generate_text(req: PromptRequest):
-    response = llm._call(prompt=req.prompt)
-    embedding = embeddings.embed_query(req.prompt)
+    # Пробуем искать в ChromaDB
+    client = MFCParserClient()
+    results = client.search_chroma(req.prompt)
+
     return {
-        "response": response,
-        "embedding": embedding
+        "input_prompt": req.prompt,
+        "found_situations": results
     }

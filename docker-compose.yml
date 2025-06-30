@@ -9,6 +9,7 @@ services:
     depends_on:
       - db
       - redis
+      - chromadb
     env_file:
       - .env
 
@@ -50,21 +51,21 @@ services:
       - postgres_data:/var/lib/postgresql/data
 
   chromadb:
-      image: chromadb/chroma:1.0.12
-      container_name: chromadb
-      expose:
-        - ${CHROMADB_PORT}
-      restart: unless-stopped
-      volumes:
-        - chroma_data:/chroma/chroma
-        - ./chromadb_config.yaml:/config.yaml
-      env_file:
-        - .env
-      healthcheck:
-        test: ["CMD", "/bin/bash", "-c", "cat < /dev/null > /dev/tcp/localhost/${CHROMADB_PORT}"]
-        interval: 30s
-        timeout: 10s
-        retries: 3
+    image: chromadb/chroma:1.0.12
+    container_name: chromadb
+    expose:
+      - ${CHROMADB_PORT}
+    restart: unless-stopped
+    volumes:
+      - chroma_data:/chroma/chroma
+      - ./chromadb_config.yaml:/config.yaml
+    env_file:
+      - .env
+    healthcheck:
+      test: ["CMD", "/bin/bash", "-c", "cat < /dev/null > /dev/tcp/localhost/${CHROMADB_PORT}"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
   redis:
     container_name: redis
